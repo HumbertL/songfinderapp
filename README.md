@@ -1,7 +1,6 @@
 # songfinderapp
 
-A new Flutter project.
-
+A flutter app that recognizes a given song recorded by your phone's microphone. Using aud.io API
 ## Getting Started
 
 This project is a starting point for a Flutter application.
