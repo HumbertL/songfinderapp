@@ -82,7 +82,7 @@ class _FoundSongState extends State<FoundSong> {
         .read<FavoritesProvider>()
         .isAlreadyInFavorites(songobject);
     if (isitafavorite == true) {
-      showRemoveFavoriteWarning(context, songobject);
+      FavoriteWarningDialog(context, songobject);
     } else {
       context.read<FavoritesProvider>().addNewSong(songobject);
       ScaffoldMessenger.of(context)
@@ -93,11 +93,11 @@ class _FoundSongState extends State<FoundSong> {
     }
   }
 
-  void showRemoveFavoriteWarning(BuildContext context, songData) {
+  void FavoriteWarningDialog(BuildContext context, songData) {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: const Text("¿Eliminar de favoritos?"),
+              title: const Text("Eliminar de favoritos?"),
               content: const Text(
                   "La canción será eliminada de tus favoritos. ¿Quieres continuar?"),
               actions: [
