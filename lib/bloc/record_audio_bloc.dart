@@ -51,7 +51,7 @@ class RecordAudioBloc extends Bloc<RecordAudioEvent, RecordAudioState> {
   Future<dynamic> _POSTSong(String file) async {
     var url = Uri.parse('https://api.audd.io/');
     var response = await post(url, body: {
-      'api_token': '3f8198a1a5f0e3046514b49c39bd5da5',
+      'api_token': 'aa7007bc784bad05208b069888f0e9d3',
       'return': 'apple_music,spotify,deezer',
       'audio': file,
       'method': 'recognize',

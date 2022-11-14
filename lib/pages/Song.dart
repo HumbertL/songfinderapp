@@ -20,6 +20,20 @@ class Song {
       this.AppleSongLink,
       this.songLink);
 
+  Song.fromDocument(Map<String, dynamic> document)
+      : artist = document['artist']! as String,
+        spotifyImageUrl = document['spotifyimageurl']! as String,
+        songtitle = document['songtitle']! as String,
+        album = document['album']! as String,
+        spotifySongLink = document['spotifySonglink'] != null
+            ? document['spotifySonglink'] as String
+            : "null",
+        AppleSongLink = document['Applesonglink']! as String,
+        releaseDate = document['releaseDate'] != null
+            ? document['releaseDate'] as String
+            : "",
+        songLink = document['songLink']! as String;
+
   Song.fromJson(Map<String, dynamic> json)
       : artist = json['artist'],
         songtitle = json['title'],

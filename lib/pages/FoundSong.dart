@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:songfinderapp/pages/HomePage.dart';
@@ -25,38 +26,21 @@ class _FoundSongState extends State<FoundSong> {
     bool isitafavorite;
 
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Here you go"),
+        actions: [
+          Padding(
+              padding: const EdgeInsets.only(right: 20.0),
+              child: GestureDetector(
+                onTap: (() {
+                  FavoriteorNot(context, widget.SongData);
+                }),
+                child: const Icon(Icons.favorite),
+              ))
+        ],
+      ),
       body: ListView(
         children: [
-          ListTile(
-            leading: IconButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  setState(() {});
-                },
-                icon: Icon(Icons.arrow_back)),
-            trailing: IconButton(
-                tooltip: "Agregar a favoritos",
-                onPressed: () {
-                  if (context
-                      .read<FavoritesProvider>()
-                      .searchFavorite(widget.SongData)) {
-                    showDialog(
-                        context: context,
-                        builder: ((context) => EliminarAlert(context)));
-                  } else {
-                    context
-                        .read<FavoritesProvider>()
-                        .addNewSong(widget.SongData);
-                    setState(() {});
-                  }
-                },
-                icon: context
-                        .read<FavoritesProvider>()
-                        .searchFavorite(widget.SongData)
-                    ? Icon(Icons.favorite)
-                    : Icon(Icons.favorite_border)),
-            title: Text("Here you go"),
-          ),
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Image.network("${widget.SongData.spotifyImageUrl}"),
@@ -93,25 +77,48 @@ class _FoundSongState extends State<FoundSong> {
     );
   }
 
-  AlertDialog EliminarAlert(BuildContext context) {
-    return AlertDialog(
-      title: const Text("Eliminar favorito"),
-      content: const Text("La cancion sera removida de tus favoritos"),
-      actions: [
-        TextButton(
-            onPressed: () {
-              Navigator.pop(context, 'Cancelar');
-            },
-            child: const Text("Cancelar")),
-        TextButton(
-            onPressed: () {
-              context.read<FavoritesProvider>().deleteSong(widget.SongData);
-              setState(() {});
-              Navigator.pop(context, 'Eliminar');
-            },
-            child: const Text('Eliminar'))
-      ],
-    );
+  Future<void> FavoriteorNot(BuildContext context, Song songobject) async {
+    bool isitafavorite = await context
+        .read<FavoritesProvider>()
+        .isAlreadyInFavorites(songobject);
+    if (isitafavorite == true) {
+      showRemoveFavoriteWarning(context, songobject);
+    } else {
+      context.read<FavoritesProvider>().addNewSong(songobject);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(const SnackBar(
+          content: Text("Canción agregada a favoritos"),
+        ));
+    }
+  }
+
+  void showRemoveFavoriteWarning(BuildContext context, songData) {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text("¿Eliminar de favoritos?"),
+              content: const Text(
+                  "La canción será eliminada de tus favoritos. ¿Quieres continuar?"),
+              actions: [
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Cancelar")),
+                TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.read<FavoritesProvider>().deleteSong(songData);
+                      ScaffoldMessenger.of(context)
+                        ..hideCurrentSnackBar()
+                        ..showSnackBar(const SnackBar(
+                          content: Text("Canción eliminada de favoritos."),
+                        ));
+                    },
+                    child: const Text("Eliminar")),
+              ],
+            ));
   }
 
   Text SongDetailSubtitleText({required String texto, required double size}) {

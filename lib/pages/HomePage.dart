@@ -5,12 +5,18 @@ import 'dart:io';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_signin_button/button_builder.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 import 'package:songfinderapp/FavoriteSongs.dart';
 import 'package:songfinderapp/bloc/record_audio_bloc.dart';
 import 'package:songfinderapp/pages/FoundSong.dart';
+import 'package:songfinderapp/pages/Login/LoginPage.dart';
 import 'package:songfinderapp/pages/Song.dart';
+import 'package:songfinderapp/pages/usersongs/bloc/user_songs_provider_bloc.dart';
+
+import '../auth/bloc/auth_bloc.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,7 +38,7 @@ class _HomePageState extends State<HomePage> {
           /*backgroundColor: Colors.black,
         foregroundColor: Colors.black,*/
           ),
-      body: Column(children: [
+      body: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
         Text(
           recordmsg,
           style: TextStyle(color: Colors.white),
@@ -63,11 +69,28 @@ class _HomePageState extends State<HomePage> {
               Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => FavoriteSongs(),
               ));
+              BlocProvider.of<UserSongsProviderBloc>(context)
+                  .add(getAllsongs());
             },
             icon: Icon(
               Icons.favorite,
               color: Colors.white,
-            ))
+            )),
+        SignInButtonBuilder(
+          text: 'Log out',
+          fontSize: 20,
+          highlightColor: Colors.redAccent[400]!,
+          textColor: Colors.black,
+          icon: Icons.login_sharp,
+          iconColor: Colors.black,
+          onPressed: () {
+            BlocProvider.of<AuthBloc>(context).add(SignOutEvent());
+            Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => LoginPage(),
+            ));
+          },
+          backgroundColor: Colors.white,
+        )
       ]),
     );
   }
@@ -129,7 +152,7 @@ class _HomePageState extends State<HomePage> {
     bool isRecording = await record.isRecording();
     if (isRecording) {
       Timer(
-        Duration(seconds: 4),
+        Duration(seconds: 6),
         () async {
           String? songPath = await record.stop();
           BlocProvider.of<RecordAudioBloc>(context)
